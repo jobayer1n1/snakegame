@@ -33,6 +33,7 @@ void main()
 
     while(1)
     {
+        system("cls");
         navigation();
         main_interface();
 
@@ -410,9 +411,9 @@ void input_history()
 
     FILE* file = fopen("snakehistory.txt","a");
     if(speed==1)
-        fprintf(file,"TIME:%s MODE:EASY SCORE:%d",timeString,score);
+        fprintf(file,"TIME:%s MODE:EASY SCORE:%d\n",timeString,score);
     else
-        fprintf(file,"TIME:%s MODE:HARD SCORE:%d",timeString,score);
+        fprintf(file,"TIME:%s MODE:HARD SCORE:%d\n",timeString,score);
 
     fclose(file);
 }
@@ -420,6 +421,7 @@ void input_history()
 void print_history()
 {
     char r;
+    system("cls");
 
     FILE*file=fopen("snakehistory.txt","r");
     char c;
@@ -447,6 +449,7 @@ void print_history()
         {
             FILE* file = fopen("snakehistory.txt","w");
             fclose(file);
+            return;
         }
         else
         {

@@ -15,8 +15,11 @@ void highscore_initialize();
 void help();
 void settings();
 void navigation();
+void snake_history_initialize();
+void input_history();
+void print_history();
 
-int i, j, height = 20, width = 20,speed=0.01;
+int i, j, height = 30, width = 30,speed=0.01;
 int gameover, score;
 int x, y, fruitx, fruity, flag;
 
@@ -24,13 +27,13 @@ int x, y, fruitx, fruity, flag;
 void main()
 {
     highscore_initialize();
+    snake_history_initialize();
 
     char c;
 
-    navigation();
-
     while(1)
     {
+        navigation();
         main_interface();
 
         printf("  --> ");
@@ -57,6 +60,10 @@ void main()
         {
             return;
         }
+        else if(c=='5')
+        {
+            print_history();
+        }
         else
         {
             system("cls");
@@ -75,15 +82,20 @@ void setup()
 
 	x = height / 2;
 	y = width / 2;
+	flag = 0;
 
-label1:
-	fruitx = rand() % 20;
-	if (fruitx == 0)
-		goto label1;
-label2:
-	fruity = rand() % 20;
-	if (fruity == 0)
-		goto label2;
+    do
+    {
+        fruitx = rand() % 20;
+
+    }while(fruitx <= 0||fruitx==x||fruitx>=height-1);
+
+    do
+    {
+        fruity = rand() % 20;
+
+    }while(fruity == 0||fruity==y||fruity>=width-1);
+
 	score = 0;
 }
 
@@ -130,7 +142,7 @@ void input()
 		case 'w':
 			flag = 4;
 			break;
-		case 'x':
+		case 'h':
 			gameover = 1;
 			break;
 		}
@@ -141,38 +153,42 @@ void input()
 void logic()
 {
 	sleep(speed);
-	switch (flag) {
-	case 1:
-		y--;
-		break;
-	case 2:
-		x++;
-		break;
-	case 3:
-		y++;
-		break;
-	case 4:
-		x--;
-		break;
-	default:
-		break;
+	switch (flag)
+	{
+        case 1:
+            y--;
+            break;
+        case 2:
+            x++;
+            break;
+        case 3:
+            y++;
+            break;
+        case 4:
+            x--;
+            break;
+        default:
+            break;
 	}
 
-	if (x <= 0 || x >= height
-		|| y <= 0 || y >= width)
+	if (x <= 0 || x >= height || y <= 0 || y >= width)
 		gameover = 1;
 
-	if (x == fruitx && y == fruity) {
-	label3:
-		fruitx = rand() % 20;
-		if (fruitx == 0)
-			goto label3;
+	if (x == fruitx && y == fruity)
+    {
+        do
+        {
+            fruitx = rand() % 20;
 
-	label4:
-		fruity = rand() % 20;
-		if (fruity == 0)
-			goto label4;
-		score += 10;
+        }while(fruitx <= 0||fruitx==x||fruitx>=height-1);
+
+        do
+        {
+            fruity = rand() % 20;
+
+        }while(fruity <= 0||fruity==y||fruity>=width-1);
+
+            score += 10;
 	}
 }
 
@@ -181,7 +197,8 @@ void main_interface()
     printf("1 --> play\n");
     printf("2 --> Highscore\n");
     printf("3 --> Help\n");
-    printf("4 --> settings\n");
+    printf("4 --> Settings\n");
+    printf("5 --> History\n");
     return;
 }
 
@@ -189,37 +206,53 @@ void play()
 {
     char c;
 
-    setup();
-
-	while (!gameover)
+    do
     {
-		draw();
-		input();
-		logic();
-	}
+        setup();
 
-    highscore_update();
+        while (gameover==0)
+        {
+            draw();
+            input();
+            logic();
+        }
 
-	while(1)
-    {
-        printf("\n--> ");
-        fflush(stdin);
-        scanf(" %c",&c);
-        if(tolower(c)=='h')
+        highscore_update();
+        input_history();
+
+        while(1)
         {
-            system("cls");
-            return;
+            printf("\n 1 --> play again .\n   --> ");
+            fflush(stdin);
+            scanf(" %c",&c);
+            c=tolower(c);
+            if(c=='h')
+            {
+                system("cls");
+                return;
+            }
+            else if(c=='e')
+            {
+                exit(0);
+            }
+            else if(c=='1')
+            {
+                break;
+            }
+            else
+            {
+                printf("\tINVALID INPUT\n");
+            }
         }
-        else if(tolower(c)=='e')
-        {
-            exit(0);
-        }
-    }
+
+    }while(tolower(c)=='1');
 }
 
 void print_highscore()
 {
     char c;
+
+    printf("\tHIGHSCORE : ");
 
     FILE *file = fopen("highscore.txt","r");
 
@@ -227,6 +260,7 @@ void print_highscore()
     {
         printf("%c",c);
     }
+    printf("\n");
     fclose(file);
 
     while(1)
@@ -267,7 +301,7 @@ void highscore_update()
 
     if(score>highscore)
     {
-        printf("\n\tYAYY!! YOU HAVE DONE BEST SCORE\n");
+        printf("\n\n\tYAYY!! YOU HAVE DONE BEST SCORE\n\n");
         fclose(file);
         FILE* file = fopen("highscore.txt","w");
         fprintf(file,"%d",score);
@@ -306,11 +340,12 @@ void settings()
 {
     char c;
 
-    printf("1 --> EASY MODE\n");
-    printf("2 --> HARD MODE\n");
+    system("cls");
 
     while(1)
     {
+        printf("1 --> EASY MODE\n");
+        printf("2 --> HARD MODE\n");
         fflush(stdin);
         printf("  --> ");
         scanf(" %c",&c);
@@ -335,6 +370,7 @@ void settings()
         }
         else
         {
+            system("cls");
             printf("INVALID INPUT\n");
         }
     }
@@ -344,4 +380,77 @@ void settings()
 void navigation()
 {
     printf("\tNAVIGATION:\n\tENTER 1,2,3... TO CHOOSE ANY OPTION\n\t'e' --> exit\n\t'h' --> home\n\n");
+}
+
+void snake_history_initialize()
+{
+    FILE* file = fopen("snakehistory.txt","r");
+    if(file == NULL)
+    {
+        fclose(file);
+        FILE* file = fopen("snakehistory.txt","w");
+        fclose(file);
+        return;
+    }
+    else
+    {
+        fclose(file);
+        return;
+    }
+}
+
+void input_history()
+{
+    time_t currentTime = time(NULL);
+
+    struct tm *localTime = localtime(&currentTime);
+
+    char timeString[100];
+    strftime(timeString, sizeof(timeString), "%H:%M:%S DATE:%d-%m-%Y", localTime);
+
+    FILE* file = fopen("snakehistory.txt","a");
+    if(speed==1)
+        fprintf(file,"TIME:%s MODE:EASY SCORE:%d",timeString,score);
+    else
+        fprintf(file,"TIME:%s MODE:HARD SCORE:%d",timeString,score);
+
+    fclose(file);
+}
+
+void print_history()
+{
+    char r;
+
+    FILE*file=fopen("snakehistory.txt","r");
+    char c;
+    while(( c=fgetc(file)) !=EOF)
+    {
+        printf("%c",c);
+    }
+    fclose(file);
+
+    fflush(stdin);
+
+    while(1)
+    {
+        printf("\v1 -> DELETE HISTORY \n  -> ");
+        scanf(" %c",&r);
+        if(tolower(r)=='h')
+        {
+            return;
+        }
+        else if(tolower(r)=='e')
+        {
+            exit(0);
+        }
+        else if(r=='1')
+        {
+            FILE* file = fopen("snakehistory.txt","w");
+            fclose(file);
+        }
+        else
+        {
+            printf("INVALID INPUT\n");
+        }
+    }
 }

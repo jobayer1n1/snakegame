@@ -4,14 +4,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <ctype.h>
 
-void initialize_highscore();
-void check_highscore();
+void main_interface();
 void print_highscore();
+void play();
+void highscore_update();
+void highscore_initialize();
+void help();
+void settings();
+void navigation();
 
-int i, j, height = 20, width = 20;
+int i, j, height = 20, width = 20,speed=0.01;
 int gameover, score;
 int x, y, fruitx, fruity, flag;
 
@@ -59,11 +62,8 @@ void draw()
 		printf("\n");
 	}
 
-	// Print the score after the
-	// game ends
-	printf("score = %d", score);
-	printf("\n");
-	printf("press X to quit the game");
+	printf("Score : %d",score);
+
 }
 
 // Function to take the input
@@ -94,7 +94,7 @@ void input()
 // each movement
 void logic()
 {
-	sleep(0.9);
+	sleep(speed);
 	switch (flag) {
 	case 1:
 		y--;
@@ -113,8 +113,8 @@ void logic()
 	}
 
 	// If the game is over
-	if (x < 0 || x > height
-		|| y < 0 || y > width)
+	if (x <= 0 || x >= height
+		|| y <= 0 || y >= width)
 		gameover = 1;
 
 	// If snake reaches the fruit
@@ -138,11 +138,63 @@ void logic()
 // Driver Code
 void main()
 {
-    initialize_highscore();
-	int m, n;
+    highscore_initialize();
 
-	// Generate boundary
-	setup();
+    char c;
+
+    navigation();
+
+    while(1)
+    {
+        main_interface();
+
+        printf("  --> ");
+        fflush(stdin);
+        scanf(" %c",&c);
+
+        if(c=='1')
+        {
+            play();
+        }
+        else if(c=='2')
+        {
+            print_highscore();
+        }
+        else if(c=='3')
+        {
+            help();
+        }
+        else if(c=='4')
+        {
+            settings();
+        }
+        else if(c=='e')
+        {
+            return;
+        }
+        else
+        {
+            system("cls");
+            printf("\tINVALID INPUT\n\n");
+        }
+    }
+
+}
+
+void main_interface()
+{
+    printf("1 --> play\n");
+    printf("2 --> Highscore\n");
+    printf("3 --> Help\n");
+    printf("4 --> settings\n");
+    return;
+}
+
+void play()
+{
+    char c;
+
+    setup();
 
 	// Until the game is over
 	while (!gameover) {
@@ -152,44 +204,98 @@ void main()
 		input();
 		logic();
 	}
-	check_highscore();
+
+    highscore_update();
+
+	while(1)
+    {
+        printf("\n--> ");
+        fflush(stdin);
+        scanf(" %c",&c);
+        if(tolower(c)=='h')
+        {
+            system("cls");
+            return;
+        }
+        else if(tolower(c)=='e')
+        {
+            exit(0);
+        }
+    }
 }
 
 void print_highscore()
 {
-    FILE* file = fopen("highscore.txt","r");
     char c;
+
+    FILE *file = fopen("highscore.txt","r");
+
     while((c=fgetc(file))!=EOF)
     {
         printf("%c",c);
     }
     fclose(file);
+
+    while(1)
+    {
+        printf("  --> ");
+        fflush(stdin);
+        scanf(" %c",&c);
+        if(tolower(c)=='h')
+        {
+            system("cls");
+            return;
+        }
+        else if(tolower(c)=='e')
+        {
+            exit(0);
+        }
+    }
+
+    return;
 }
-void check_highscore()
+
+void highscore_update()
 {
-    FILE* file=fopen("highscore.txt","r");
-    char* tmp = malloc(sizeof(char));
+    FILE* file = fopen("highscore.txt","r");
     char c;
+    char* tmp=malloc(sizeof(char));
     int i = 0;
-    while((c=fgetc(file))!='\n')
+
+    while((c=fgetc(file))!=EOF)
     {
         tmp[i]=c;
         i++;
-        tmp=realloc(tmp,sizeof(char));
+        tmp = realloc(tmp,sizeof(char));
     }
     tmp[i]='\0';
-    int highscore = atoi(tmp);
 
-    printf("%d",highscore);
-    sleep(1);
+    int highscore = atoi(tmp);
 
     if(score>highscore)
     {
+        printf("\n\tYAYY!! YOU HAVE DONE BEST SCORE\n");
         fclose(file);
         FILE* file = fopen("highscore.txt","w");
         fprintf(file,"%d",score);
         fclose(file);
-        return;
+    }
+    else
+    {
+        fclose(file);
+    }
+    return;
+}
+
+void highscore_initialize()
+{
+    FILE* file = fopen("highscore.txt","r");
+    if(file==NULL)
+    {
+        fclose(file);
+        FILE*file= fopen("highscore.txt","w");
+        fprintf(file,"0");
+        fclose(file);
     }
     else
     {
@@ -198,21 +304,51 @@ void check_highscore()
     }
 }
 
-
-void initialize_highscore()
+void help()
 {
-    FILE* file = fopen("highscore.txt","r");
-    if(file== NULL)
+    printf("SHIHAB");
+}
+
+void settings()
+{
+    char c;
+
+    printf("1 --> EASY MODE\n");
+    printf("2 --> HARD MODE\n");
+
+    while(1)
     {
-        fclose(file);
-        FILE* file = fopen("highscore.txt","w");
-        fprintf(file,"0");
-        fclose(file);
-        return;
+        fflush(stdin);
+        printf("  --> ");
+        scanf(" %c",&c);
+
+        if(c=='1')
+        {
+            speed=1;
+            return;
+        }
+        else if(c=='2')
+        {
+            speed=0.01;
+            return;
+        }
+        else if(tolower(c)=='h')
+        {
+            return;
+        }
+        else if(tolower(c)=='e')
+        {
+            exit(0);
+        }
+        else
+        {
+            printf("INVALID INPUT\n");
+        }
     }
-    else
-    {
-        fclose(file);
-        return;
-    }
+
+}
+
+void navigation()
+{
+    printf("\tNAVIGATION:\n\tENTER 1,2,3... TO CHOOSE ANY OPTION\n\t'e' --> exit\n\t'h' --> home\n\n");
 }

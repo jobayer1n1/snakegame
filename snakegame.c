@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include<ctype.h>
 
 void set_up();
 void draw();
@@ -111,8 +112,16 @@ void draw()
 				printf("#");
 			}
 			else {
-				if (i == x && j == y)
-					printf("0");
+				if (i == x && j == y && flag==0)
+					printf(">");
+                else if(i==x&&j==y&&flag==1)
+                    printf("<");
+                else if(i==x&&j==y&&flag==2)
+                    printf("V");
+                else if(i==x&&j==y&&flag==3)
+                    printf(">");
+                else if(i==x&&j==y&&flag==4)
+                    printf("^");
 				else if (i == fruitx
 						&& j == fruity)
 					printf("*");

@@ -43,6 +43,7 @@ void main()
         printf("  --> ");
         fflush(stdin);
         scanf(" %c",&c);
+        fflush(stdin);
 
         if(c=='1')
         {
@@ -243,6 +244,7 @@ void play()
             printf("\n 1 --> play again .\n   --> ");
             fflush(stdin);
             scanf(" %c",&c);
+            fflush(stdin);
             c=tolower(c);
             if(c=='h')
             {
@@ -374,6 +376,7 @@ void settings()
         fflush(stdin);
         printf("  --> ");
         scanf(" %c",&c);
+        fflush(stdin);
 
         if(c=='1')
         {
@@ -460,7 +463,9 @@ void print_history()
     while(1)
     {
         printf("\v1 -> DELETE HISTORY \n  -> ");
+        fflush(stdin);
         scanf(" %c",&r);
+        fflush(stdin);
         if(tolower(r)=='h')
         {
             return;

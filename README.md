@@ -1,1 +1,1 @@
-# snakegame
+#snake game for newbies

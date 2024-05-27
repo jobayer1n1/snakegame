@@ -1,1 +1,2 @@
-#snake game for newbies
+SNAKE GAME FOR NEWBIES
+

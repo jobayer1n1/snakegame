@@ -360,7 +360,32 @@ void highscore_initialize()
 
 void help()
 {
-    printf("SHIHAB");
+    char c;
+    system("cls");
+    printf("Use 'a' , 's' , 'd' , 'w' to move the snake left, down, right and upwards.\n");
+    printf("Eat the fruits represented as '*' within the box to increase your score.\n");
+    printf("Avoid hitting the walls of the box. If you do it will result in a game over.\n");
+    printf("Press 'h' to go back to the main interface.\n");
+    fflush(stdin);
+    while(1)
+    {
+        printf("  --> ");
+        scanf("%c",&c);
+        fflush(stdin);
+        if(c=='h')
+        {
+            return;
+        }
+        else if(c=='e')
+        {
+            exit(0);
+        }
+        else
+        {
+            printf("Invalid input\n");
+        }
+    }
+
 }
 
 void settings()

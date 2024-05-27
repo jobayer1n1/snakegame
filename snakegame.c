@@ -19,8 +19,10 @@ void navigation();
 void snake_history_initialize();
 void input_history();
 void print_history();
+void reset_highscore();
 
-int i, j, height = 30, width = 30,speed=0.01;
+int i, j, height = 30, width = 30;
+float speed = 1;
 int gameover, score;
 int x, y, fruitx, fruity, flag;
 
@@ -104,6 +106,13 @@ void setup()
 void draw()
 {
 	system("cls");
+	printf("Score : %d\n",score);
+
+	if (speed==1)
+            printf("MODE : EASY\n\n");
+    else
+            printf("MODE : HARD\n\n");
+
 	for (i = 0; i < height; i++) {
 		for (j = 0; j < width; j++) {
 			if (i == 0 || i == width - 1
@@ -124,7 +133,7 @@ void draw()
                     printf("^");
 				else if (i == fruitx
 						&& j == fruity)
-					printf("*");
+					printf("O");
 				else
 					printf(" ");
 			}
@@ -132,29 +141,28 @@ void draw()
 		printf("\n");
 	}
 
-	printf("Score : %d",score);
-
 }
 
 void input()
 {
 	if (kbhit()) {
-		switch (getch()) {
-		case 'a':
-			flag = 1;
-			break;
-		case 's':
-			flag = 2;
-			break;
-		case 'd':
-			flag = 3;
-			break;
-		case 'w':
-			flag = 4;
-			break;
-		case 'h':
-			gameover = 1;
-			break;
+		switch (tolower(getch()))
+		{
+            case 'a':
+                flag = 1;
+                break;
+            case 's':
+                flag = 2;
+                break;
+            case 'd':
+                flag = 3;
+                break;
+            case 'w':
+                flag = 4;
+                break;
+            case 'h':
+                gameover = 1;
+                break;
 		}
 	}
 }
@@ -261,6 +269,7 @@ void play()
 void print_highscore()
 {
     char c;
+    system("cls");
 
     printf("\tHIGHSCORE : ");
 
@@ -275,9 +284,10 @@ void print_highscore()
 
     while(1)
     {
-        printf("  --> ");
+        printf(" 1 --> reset highscore \n   --> ");
         fflush(stdin);
         scanf(" %c",&c);
+        fflush(stdin);
         if(tolower(c)=='h')
         {
             system("cls");
@@ -286,6 +296,11 @@ void print_highscore()
         else if(tolower(c)=='e')
         {
             exit(0);
+        }
+        else if(tolower(c)=='1')
+        {
+            reset_highscore();
+            return;
         }
     }
 
@@ -311,7 +326,7 @@ void highscore_update()
 
     if(score>highscore)
     {
-        printf("\n\n\tYAYY!! YOU HAVE DONE BEST SCORE\n\n");
+        printf("\n\n\tYAYY!! YOU HAVE SCORED THE HIGHEST POINTS\n\n");
         fclose(file);
         FILE* file = fopen("highscore.txt","w");
         fprintf(file,"%d",score);
@@ -465,4 +480,11 @@ void print_history()
             printf("INVALID INPUT\n");
         }
     }
+}
+
+void reset_highscore()
+{
+    FILE*file = fopen("highscore.txt","w");
+    fprintf(file,"0");
+    fclose(file);
 }

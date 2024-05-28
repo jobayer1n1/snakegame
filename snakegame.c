@@ -20,12 +20,14 @@ void snake_history_initialize();
 void input_history();
 void print_history();
 void reset_highscore();
+void tail_size_update();
+void tail_initialize();
 
-int i, j, height = 30, width = 30;
+int i, j,k=0,len=1, height = 30, width = 30,targetx,targety;
 float speed = 1;
 int gameover, score;
-int x, y, fruitx, fruity, flag;
-
+int x, y, fruitx, fruity, flag=3;
+char* tail;
 
 void main()
 {
@@ -125,16 +127,35 @@ void draw()
 				if (i == x && j == y && flag==0)
 					printf(">");
                 else if(i==x&&j==y&&flag==1)
+                {
                     printf("<");
+                    if(flag==1&&i==x&&j<=y+len&&j>=y+1)
+                        printf("-");
+                }
                 else if(i==x&&j==y&&flag==2)
-                    printf("V");
+                {
+                    printf("v");
+                    if(flag==2&&j==y&&i<=x-1&&i>=x-len)
+                    printf("|");
+                }
+
                 else if(i==x&&j==y&&flag==3)
+                {
                     printf(">");
-                else if(i==x&&j==y&&flag==4)
+                    if(i==x&&j>=y-len&&j<=y-1&&flag==3)
+                        printf("-");
+                }
+                else if(j==y&&flag==4)
+                {
+
                     printf("^");
+                    if(flag==4&&j==y&&i>=x+1&&i<=x+len)
+                    printf("|");
+                }
 				else if (i == fruitx
 						&& j == fruity)
 					printf("O");
+
 				else
 					printf(" ");
 			}
@@ -151,15 +172,23 @@ void input()
 		{
             case 'a':
                 flag = 1;
+                targetx=x;
+                targety=y;
                 break;
             case 's':
                 flag = 2;
+                targetx=x;
+                targety=y;
                 break;
             case 'd':
                 flag = 3;
+                targetx=x;
+                targety=y;
                 break;
             case 'w':
                 flag = 4;
+                targetx=x;
+                targety=y;
                 break;
             case 'h':
                 gameover = 1;
@@ -208,6 +237,7 @@ void logic()
         }while(fruity <= 0||fruity==y||fruity>=width-1);
 
             score += 10;
+            len++;
 	}
 }
 
@@ -518,3 +548,5 @@ void reset_highscore()
     fprintf(file,"0");
     fclose(file);
 }
+
+

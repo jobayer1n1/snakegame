@@ -20,10 +20,17 @@ void snake_history_initialize();
 void input_history();
 void print_history();
 void reset_highscore();
-void tail_size_update();
-void tail_initialize();
+void resume_initialize();
+int resume_available();
+void resume_load();
+void resume_play();
+void main_without_resume();
+void main_with_resume();
+void resume_wait();
+void resume_clear();
+void resume_update();
 
-int i, j,k=0,len=1, height = 30, width = 30,targetx,targety;
+int i, j,k=0,len=0, height = 30, width = 30;
 float speed = 1;
 int gameover, score;
 int x, y, fruitx, fruity, flag=3;
@@ -34,48 +41,13 @@ void main()
     highscore_initialize();
     snake_history_initialize();
 
-    char c;
-
-    while(1)
+    if(resume_available())
     {
-        system("cls");
-        navigation();
-        main_interface();
-
-        printf("  --> ");
-        fflush(stdin);
-        scanf(" %c",&c);
-        fflush(stdin);
-
-        if(c=='1')
-        {
-            play();
-        }
-        else if(c=='2')
-        {
-            print_highscore();
-        }
-        else if(c=='3')
-        {
-            help();
-        }
-        else if(c=='4')
-        {
-            settings();
-        }
-        else if(c=='e')
-        {
-            return;
-        }
-        else if(c=='5')
-        {
-            print_history();
-        }
-        else
-        {
-            system("cls");
-            printf("\tINVALID INPUT\n\n");
-        }
+        main_with_resume();
+    }
+    else
+    {
+        main_without_resume();
     }
 
 }
@@ -127,35 +99,24 @@ void draw()
 				if (i == x && j == y && flag==0)
 					printf(">");
                 else if(i==x&&j==y&&flag==1)
-                {
                     printf("<");
-                    if(flag==1&&i==x&&j<=y+len&&j>=y+1)
-                        printf("-");
-                }
                 else if(i==x&&j==y&&flag==2)
-                {
-                    printf("v");
-                    if(flag==2&&j==y&&i<=x-1&&i>=x-len)
-                    printf("|");
-                }
-
+                    printf("V");
                 else if(i==x&&j==y&&flag==3)
-                {
                     printf(">");
-                    if(i==x&&j>=y-len&&j<=y-1&&flag==3)
-                        printf("-");
-                }
-                else if(j==y&&flag==4)
-                {
-
+                else if(i==x&&j==y&&flag==4)
                     printf("^");
-                    if(flag==4&&j==y&&i>=x+1&&i<=x+len)
-                    printf("|");
-                }
 				else if (i == fruitx
 						&& j == fruity)
 					printf("O");
-
+                else if(i==x&&j>=y-len&&j<=y-1&&flag==3)
+                    printf("-");
+                else if(flag==1&&i==x&&j<=y+len&&j>=y+1)
+                    printf("-");
+                else if(flag==2&&j==y&&i<=x-1&&i>=x-len)
+                    printf("|");
+                else if(flag==4&&j==y&&i>=x+1&&i<=x+len)
+                    printf("|");
 				else
 					printf(" ");
 			}
@@ -167,34 +128,28 @@ void draw()
 
 void input()
 {
-	if (kbhit()) {
+	if (kbhit())
+    {
 		switch (tolower(getch()))
 		{
             case 'a':
                 flag = 1;
-                targetx=x;
-                targety=y;
                 break;
             case 's':
                 flag = 2;
-                targetx=x;
-                targety=y;
                 break;
             case 'd':
                 flag = 3;
-                targetx=x;
-                targety=y;
                 break;
             case 'w':
                 flag = 4;
-                targetx=x;
-                targety=y;
                 break;
             case 'h':
                 gameover = 1;
                 break;
 		}
 	}
+	resume_update();
 }
 
 
@@ -243,11 +198,24 @@ void logic()
 
 void main_interface()
 {
-    printf("1 --> play\n");
-    printf("2 --> Highscore\n");
-    printf("3 --> Help\n");
-    printf("4 --> Settings\n");
-    printf("5 --> History\n");
+    if(resume_available())
+    {
+        printf("1 --> Resume\n");
+        printf("2 --> New game\n");
+        printf("3 --> Highscore\n");
+        printf("4 --> History\n");
+        printf("5 --> Settings\n");
+        printf("6 --> Help\n");
+    }
+    else
+    {
+        printf("1 --> New game\n");
+        printf("2 --> Highscore\n");
+        printf("3 --> History\n");
+        printf("4 --> Settings\n");
+        printf("5 --> Help\n");
+    }
+
     return;
 }
 
@@ -295,7 +263,7 @@ void play()
             }
         }
 
-    }while(tolower(c)=='1');
+    }while(c=='1');
 }
 
 void print_highscore()
@@ -550,3 +518,228 @@ void reset_highscore()
 }
 
 
+void resume_initialize()
+{
+    FILE* file = fopen("snakeresume.txt","r");
+    if(file==NULL)
+    {
+        fclose(file);
+        FILE* file = fopen("snakeresume.txt","w");
+        fclose(file);
+    }
+    else
+        fclose(file);
+}
+
+int resume_available()
+{
+    FILE* file = fopen("snakeresume.txt","r");
+    char c;
+    int tmp =0;
+    while((c=fgetc(file))!=EOF)
+    {
+        if(c>='0'&&c<='9')
+        {
+            tmp++;
+        }
+    }
+    return tmp;
+}
+
+void resume_load()
+{
+    FILE* file = fopen("snakeresume.txt","r");
+    char c;
+    int numbers[6];
+    int tmp=0;
+
+    while((c=fgetc(file))!=EOF)
+    {
+        if(c>='0'&&c<='9')
+        {
+            numbers[tmp]=((int)c) - 48;
+            printf("%d\n",numbers[tmp]);
+            tmp++;
+            if(tmp>=6)
+            {
+                break;
+            }
+        }
+    }
+    fclose(file);
+
+    x=numbers[0];
+    y=numbers[1];
+    flag=numbers[2];
+    fruitx=numbers[3];
+    fruity=numbers[4];
+    len=numbers[5];
+
+}
+
+void resume_play()
+{
+    char c;
+
+    do
+    {
+        resume_load();
+        resume_wait();
+        while (gameover==0)
+        {
+            draw();
+            input();
+            logic();
+        }
+
+        highscore_update();
+        input_history();
+        resume_clear();
+
+        while(1)
+        {
+            printf("\n 1 --> play again .\n   --> ");
+            fflush(stdin);
+            scanf(" %c",&c);
+            fflush(stdin);
+            c=tolower(c);
+            if(c=='h')
+            {
+                system("cls");
+                return;
+            }
+            else if(c=='e')
+            {
+                exit(0);
+            }
+            else if(c=='1')
+            {
+                break;
+            }
+            else
+            {
+                printf("\tINVALID INPUT\n");
+            }
+        }
+
+    }while(c=='1');
+}
+
+void resume_clear()
+{
+    FILE* file = fopen("snakeresume.txt","w");
+    fclose(file);
+}
+
+void main_without_resume()
+{
+    char c;
+
+    while(1)
+    {
+        system("cls");
+        navigation();
+        main_interface();
+
+        printf("  --> ");
+        fflush(stdin);
+        scanf("%c",&c);
+        fflush(stdin);
+
+        if(c=='1')
+        {
+            play();
+        }
+        else if(c=='2')
+        {
+            print_highscore();
+        }
+        else if(c=='3')
+        {
+            print_history();
+        }
+        else if(c=='4')
+        {
+            settings();
+        }
+        else if(c=='e')
+        {
+            return;
+        }
+        else if(c=='5')
+        {
+            help();
+        }
+        else
+        {
+            system("cls");
+            printf("\tINVALID INPUT\n\n");
+        }
+    }
+}
+
+
+void main_with_resume()
+{
+    char c;
+
+    while(1)
+    {
+        system("cls");
+        navigation();
+        main_interface();
+
+        printf("  --> ");
+        fflush(stdin);
+        scanf("%c",&c);
+        fflush(stdin);
+
+        if(c=='1')
+            resume_play();
+        if(c=='2')
+        {
+            play();
+        }
+        else if(c=='3')
+        {
+            print_highscore();
+        }
+        else if(c=='4')
+        {
+            print_history();
+        }
+        else if(c=='5')
+        {
+            settings();
+        }
+        else if(c=='6')
+        {
+            help();
+        }
+        else
+        {
+            system("cls");
+            printf("\tINVALID INPUT\n\n");
+        }
+    }
+}
+
+void resume_wait()
+{
+    int tmp = 3;
+    while(tmp>0)
+    {
+        draw();
+        printf("\n\n\tSTART IN %d SECONDS\n",tmp);
+        sleep(1);
+        tmp--;
+        system("cls");
+    }
+}
+
+void resume_update()
+{
+    FILE* file = fopen("snakeresume.txt","w");
+    fprintf(file,"%d %d %d %d %d %d",x,y,flag,fruitx,fruity,len);
+    fclose(file);
+}

@@ -129,7 +129,7 @@ void draw()
                 else if(i==x&&j==y&&flag==1)
                     printf("<");
                 else if(i==x&&j==y&&flag==2)
-                    printf("V");
+                    printf("v");
                 else if(i==x&&j==y&&flag==3)
                     printf(">");
                 else if(i==x&&j==y&&flag==4)
@@ -537,5 +537,4 @@ void reset_highscore()
     fprintf(file,"0");
     fclose(file);
 }
-
 
